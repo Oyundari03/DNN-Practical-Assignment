@@ -75,9 +75,9 @@ def get_dataloader(dataset_name, batch_size, num_workers, data_dir):
     ])
 
     train_dataset = DatasetClass(root=data_dir, train=True,
-                                 download=False, transform=train_transform)
+                                 download=True, transform=train_transform)
     test_dataset  = DatasetClass(root=data_dir, train=False,
-                                 download=False, transform=test_transform)
+                                 download=True, transform=test_transform)
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True,
