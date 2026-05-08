@@ -1,12 +1,6 @@
-#!/usr/local/anaconda3/bin/python3
 """
 Multi-GPU 実験結果の比較グラフ作成スクリプト
 train_multigpu.py が出力した CSV を読み込んでグラフ化
-
-使い方:
-  python plot_results.py
-  # result_cifar10_1gpu.csv / result_cifar10_2gpu.csv / result_cifar10_4gpu.csv
-  # が同じディレクトリにある前提
 """
 
 import os
@@ -16,9 +10,9 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 CONFIGS = [
-    ("result_cifar10_1gpu.csv",  "1 GPU",  "blue"),
-    ("result_cifar10_2gpu.csv",  "2 GPU",  "orange"),
-    ("result_cifar10_4gpu.csv",  "4 GPU",  "green"),
+    ("results/result_cifar10_1gpu.csv",  "1 GPU",  "blue"),
+    ("results/result_cifar10_2gpu.csv",  "2 GPU",  "orange"),
+    ("results/result_cifar10_4gpu.csv",  "4 GPU",  "green"),
 ]
 
 def load_csv(path):
@@ -59,5 +53,5 @@ axes[2].set_xlabel("Epoch"); axes[2].set_ylabel("Seconds")
 axes[2].legend(); axes[2].grid(True)
 
 plt.tight_layout()
-plt.savefig("multigpu_comparison.png", dpi=150)
+plt.savefig("results/multigpu_comparison.png", dpi=150)
 print("[Saved] multigpu_comparison.png")
