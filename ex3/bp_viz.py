@@ -4,18 +4,6 @@ Kadai 3: CNN Visualization 2 - Back Propagation based methods
   1. Vanilla Saliency Map (Simonyan et al. 2014)
   2. SmoothGrad (Smilkov et al. 2017)
   3. Guided Backpropagation (Springenberg et al. 2015)
-
-References:
-  [1] K. Simonyan et al., "Deep inside convolutional networks", ICLR Workshop 2014
-      https://arxiv.org/abs/1312.6034
-  [2] D. Smilkov et al., "SmoothGrad: removing noise by adding noise", 2017
-      https://arxiv.org/abs/1706.03825
-  [3] J.T. Springenberg et al., "Striving for Simplicity: The All Convolutional Net"
-      https://arxiv.org/abs/1412.6806
-
-Usage:
-  python bp_viz.py
-  Results saved to ./bp_results/
 """
 
 from __future__ import print_function
@@ -36,7 +24,7 @@ from PIL import Image
 # ─────────────────────────────────────────────────────────
 INPUT_SIZE  = 256
 OUTPUT_DIR  = "./bp_results"
-IMAGE_DIR   = "../ex2/occlusion_results"   
+IMAGE_DIR   = "/home/yanai-lab/oyundari/kadai_3b/ex2/occlusion_results/"   # reuse images from kadai 2
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -266,6 +254,8 @@ def main():
     model.eval()
     print("[Model] VGG16 loaded")
 
+    all_results = []   # collect per-image results for summary figure
+
     for sample in SAMPLE_IMAGES:
         # Find image file
         img_path = os.path.join(IMAGE_DIR, sample["name"] + ".jpg")
@@ -318,8 +308,68 @@ def main():
             fname = sample["name"] + "_" + method_name.replace(" ", "_") + ".npy"
             np.save(os.path.join(OUTPUT_DIR, fname), sal)
 
-        # Save comparison figure
+        # Save individual comparison figure
         save_comparison(img_pil, results, sample["name"], sample["desc"])
+
+        # Store for summary figure
+        all_results.append({
+            "desc":    sample["desc"],
+            "img_pil": img_pil,
+            "results": results,
+        })
+
+    # ── Summary figure: all images x all methods in one file ──
+    if all_results:
+        method_names = list(all_results[0]["results"].keys())
+        n_images  = len(all_results)
+        n_cols    = len(method_names) + 1   # Original + each method
+        # 2 rows per image: saliency map row + overlay row
+        n_rows    = n_images * 2
+
+        fig, axes = plt.subplots(
+            n_rows, n_cols,
+            figsize=(5 * n_cols, 5 * n_images)
+        )
+        fig.suptitle(
+            "BP Visualization Summary\n"
+            "Odd rows: Saliency map  /  Even rows: Overlay on original",
+            fontsize=14, y=1.01
+        )
+
+        for i, res in enumerate(all_results):
+            img_pil_i = res["img_pil"]
+            img_arr   = np.array(img_pil_i)
+            row_sal  = i * 2       # saliency map row
+            row_over = i * 2 + 1   # overlay row
+
+            # Col 0: original image (both rows)
+            axes[row_sal,  0].imshow(img_pil_i)
+            axes[row_sal,  0].set_title(res["desc"], fontsize=10)
+            axes[row_sal,  0].axis("off")
+            axes[row_over, 0].imshow(img_pil_i)
+            axes[row_over, 0].set_title("(original)", fontsize=9)
+            axes[row_over, 0].axis("off")
+
+            for j, mname in enumerate(method_names):
+                sal = normalize_map(res["results"][mname])
+                col = j + 1
+
+                # Saliency map
+                axes[row_sal, col].imshow(sal, cmap="hot")
+                axes[row_sal, col].set_title(mname, fontsize=10)
+                axes[row_sal, col].axis("off")
+
+                # Overlay
+                overlaid = overlay_saliency(img_arr, res["results"][mname])
+                axes[row_over, col].imshow(overlaid)
+                axes[row_over, col].set_title(mname + " (overlay)", fontsize=9)
+                axes[row_over, col].axis("off")
+
+        plt.tight_layout()
+        summary_path = os.path.join(OUTPUT_DIR, "bp_all_summary.png")
+        plt.savefig(summary_path, dpi=150, bbox_inches="tight")
+        plt.close()
+        print("\n[Saved summary]", summary_path)
 
     print("\n[Done] All results saved to:", OUTPUT_DIR)
 

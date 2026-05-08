@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Multi-GPU Training: CIFAR-10/100 with ResNet152
+Multi-GPU Training: CIFAR-10 with ResNet152
 Kadai 1: Compare training time with 1/2/4 GPUs
 
 Usage:
@@ -8,9 +8,6 @@ Usage:
   python train_multigpu.py --num_gpus 2 --dataset cifar10
   python train_multigpu.py --num_gpus 4 --dataset cifar10
 
-Reference:
-  https://pytorch.org/tutorials/beginner/blitz/data_parallel_tutorial.html
-  https://pytorch.org/docs/stable/notes/multiprocessing.html
 """
 
 from __future__ import print_function
@@ -36,7 +33,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
-from torchvision.models import resnet152
+from torchvision.models import resnet18
 
 
 def get_args():
@@ -105,7 +102,7 @@ def replace_bn_with_gn(module):
 
 
 def build_model(num_classes, num_gpus):
-    model = resnet152(pretrained=False)
+    model = resnet18(weights=None)
     model.fc = nn.Linear(model.fc.in_features, num_classes)
 
     # Replace BatchNorm with GroupNorm to avoid cuDNN EXECUTION_FAILED
@@ -175,7 +172,7 @@ def main():
 
     model, device = build_model(num_classes, args.num_gpus)
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), lr=0.1,
+    optimizer = optim.SGD(model.parameters(), lr=0.01,
                           momentum=0.9, weight_decay=1e-4)
     scheduler = optim.lr_scheduler.MultiStepLR(
         optimizer, milestones=[5, 8], gamma=0.1)
