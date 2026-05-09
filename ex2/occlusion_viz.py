@@ -29,7 +29,7 @@ print("[Device]", device)
 STRIDE = 8 if device.type == "cuda" else 16
 print("[Stride]", STRIDE, "(8 for GPU, 16 for CPU to save time)")
 
-OUTPUT_DIR = "./occlusion_results"
+OUTPUT_DIR = "./results"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # ── Sample images (already downloaded) ───────────────────
