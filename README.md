@@ -30,14 +30,6 @@ DNN-Practical-Assignment/
 ├── ex1/   # Multi GPU
 ├── ex2/   # CNN可視化1（Occlusion）
 ├── ex3/   # CNN可視化2（BP）
-├── ex4/   # CNN可視化3（Grad-CAM）
-├── ex5/   # DeepDream
-├── ex6/   # DCGAN
-├── ex7/   # Conditional GAN
-├── ex8/   # Style Transfer
-├── ex9/   # Pix2Pix
-├── ex10/  # CycleGAN
-├── ex11/  # Diffusion
 └── README.md
 ```
 
