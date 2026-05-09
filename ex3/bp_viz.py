@@ -24,7 +24,7 @@ from PIL import Image
 # ─────────────────────────────────────────────────────────
 INPUT_SIZE  = 256
 OUTPUT_DIR  = "./bp_results"
-IMAGE_DIR   = "/home/yanai-lab/oyundari/kadai_3b/ex2/occlusion_results/"   # reuse images from kadai 2
+IMAGE_DIR   = "/home/yanai-lab/oyundari/kadai_3b/ex2/occlusion_results/"   
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -39,8 +39,8 @@ SAMPLE_IMAGES = [
 ]
 
 # SmoothGrad settings
-SMOOTHGRAD_N     = 20    # number of noisy samples
-SMOOTHGRAD_SIGMA = 0.15  # noise level (fraction of input range)
+SMOOTHGRAD_N     = 20    
+SMOOTHGRAD_SIGMA = 0.15  
 
 # ─────────────────────────────────────────────────────────
 # Preprocessing
@@ -61,7 +61,6 @@ def load_image(path):
     return img_pil, tensor
 
 def tensor_to_display(t):
-    """Convert normalized tensor (3,H,W) to displayable (H,W,3) uint8."""
     # Unnormalize
     t = t.clone()
     for c, (m, s) in enumerate(zip(MEAN, STD)):
@@ -74,7 +73,6 @@ def tensor_to_display(t):
 # Guided BP hook
 # ─────────────────────────────────────────────────────────
 class GuidedReLU(nn.Module):
-    """ReLU that passes only positive gradients during backward."""
     def forward(self, x):
         return torch.relu(x)
 
@@ -83,7 +81,6 @@ class GuidedReLU(nn.Module):
         return torch.clamp(grad, min=0.0)
 
 def register_guided_hooks(model):
-    """Replace ReLU activations with GuidedReLU and register hooks."""
     hooks = []
     for module in model.modules():
         if isinstance(module, nn.ReLU):
@@ -101,10 +98,6 @@ def remove_hooks(hooks):
 # 1. Vanilla Saliency Map
 # ─────────────────────────────────────────────────────────
 def vanilla_saliency(model, img_tensor, label_idx):
-    """
-    Compute gradient of true-class score w.r.t. input image.
-    Saliency = |dScore/dInput|
-    """
     model.eval()
     inp = img_tensor.unsqueeze(0).to(device)
     inp.requires_grad_(True)
@@ -124,10 +117,6 @@ def vanilla_saliency(model, img_tensor, label_idx):
 # 2. SmoothGrad
 # ─────────────────────────────────────────────────────────
 def smooth_grad(model, img_tensor, label_idx, n=SMOOTHGRAD_N, sigma=SMOOTHGRAD_SIGMA):
-    """
-    Average gradients over N noisy versions of the input.
-    Noise level: sigma * (max - min) of input tensor.
-    """
     model.eval()
     noise_level = sigma * (img_tensor.max() - img_tensor.min()).item()
     sum_grad = torch.zeros_like(img_tensor)
@@ -156,10 +145,6 @@ def smooth_grad(model, img_tensor, label_idx, n=SMOOTHGRAD_N, sigma=SMOOTHGRAD_S
 # 3. Guided Backpropagation
 # ─────────────────────────────────────────────────────────
 def guided_backprop(model, img_tensor, label_idx):
-    """
-    Register backward hooks on all ReLUs to pass only positive gradients.
-    This produces sharper, cleaner saliency maps.
-    """
     model.eval()
 
     # Register guided BP hooks
@@ -185,14 +170,12 @@ def guided_backprop(model, img_tensor, label_idx):
 # Visualization helper
 # ─────────────────────────────────────────────────────────
 def normalize_map(m):
-    """Normalize saliency map to [0, 1]."""
     m = m - m.min()
     if m.max() > 0:
         m = m / m.max()
     return m
 
 def overlay_saliency(img_arr, saliency, alpha=0.5):
-    """Overlay saliency map (hot colormap) on original image."""
     sal_norm = normalize_map(saliency)
     heatmap = plt.cm.hot(sal_norm)[:, :, :3]   # (H, W, 3) RGB
     heatmap = (heatmap * 255).astype(np.uint8)
@@ -200,10 +183,6 @@ def overlay_saliency(img_arr, saliency, alpha=0.5):
     return blended
 
 def save_comparison(img_pil, results, sample_name, desc):
-    """
-    Save 4-panel figure:
-      Original | Vanilla Saliency | SmoothGrad | Guided BP
-    """
     img_arr = np.array(img_pil)
     n_methods = len(results)
     fig, axes = plt.subplots(2, n_methods + 1, figsize=(5 * (n_methods + 1), 10))
