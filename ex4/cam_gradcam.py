@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-課題4 : CAM / Grad-CAM Visualization
+Kadai4 : CAM / Grad-CAM Visualization
 Model : ResNet50 (ImageNet Pretrained)
 """
 
