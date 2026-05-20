@@ -57,7 +57,7 @@ COCO データセットの画像をコンテンツ画像として使用し、rev
 ```bash
 CUDA_VISIBLE_DEVICES=0,1,2,3 python train.py \
   --dataset_path /export/data/dataset/COCO \
-  --style_image_path ./style_img/our_style_img.png > log.txt 2>&1 &
+  --style_image_path ./style_img/our_style_img.png > our_train_log.txt 2>&1 &
 ```
 
 ### コマンドの説明
@@ -74,8 +74,8 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python train.py \
 - `--style_image_path ./style_img/our_style_img.png`  
   スタイル画像として reverie 画像を指定します。
 
-- `> log.txt 2>&1 &`  
-  学習ログを `log.txt` に保存し、バックグラウンドで実行します。
+- `> our_train_log.txt 2>&1 &`  
+  学習ログを `our_train_log.txt` に保存し、バックグラウンドで実行します。
 
 ## スタイル変換コマンド
 
@@ -109,57 +109,15 @@ Train loss と Validation loss が大きく離れていないため、学習デ�
 
 ## 結果画像
 
-以下は、学習したモデルを用いて猫画像をスタイル変換した結果です。
+以下は，ソースコード付属モデルと自分で学習した Reverie スタイルモデルを用いて猫画像をスタイル変換した結果です。
 
-![Style Transfer Result](./output_img/result_our.png)
+上段：スタイル画像
+下段：猫画像へのスタイル変換結果
+Style 1〜3：ソースコード付属モデル
+Style 4：自分で学習した Reverie スタイルモデル
 
-## フォルダ整理について
+<img width="1277" height="548" alt="image" src="https://github.com/user-attachments/assets/9fb19fe4-e751-4075-99e0-208a01809e8c" />
 
-GitHub に提出するため、`ex8` フォルダ内の不要なファイルを整理しました。
-課題の説明・実行・結果確認に必要なファイルだけを残し、実行時に自動生成されるファイルや、提出に不要な一時ファイルは削除対象としました。
-
-### 残したファイル
-
-| ファイル / フォルダ | 理由 |
-|---|---|
-| `train.py` | モデルを学習するためのソースコード |
-| `stylize.py` | 学習済みモデルでスタイル変換を行うソースコード |
-| `style_img/our_style_img.png` | 実験で使用した reverie スタイル画像 |
-| `cat.png` | スタイル変換に使用した入力画像 |
-| `output_img/result_our.png` | スタイル変換の結果画像 |
-| `models/our_style_model.pt` | 学習済みモデル |
-| `README.md` | 実験内容、実行方法、結果を説明するファイル |
-
-### 削除対象にした不要ファイル
-
-| 削除対象 | 理由 |
-|---|---|
-| `__pycache__/` | Python 実行時に自動生成されるキャッシュであり、提出には不要 |
-| `.ipynb_checkpoints/` | Jupyter Notebook が自動生成するバックアップであり、提出には不要 |
-| `*.pyc` | Python のコンパイル済みキャッシュであり、再生成可能 |
-| `log.txt` | 学習ログ全文は長いため、README には最後の loss のみ記載 |
-| 不要な出力画像 | 最終結果として使用した `result_our.png` のみ残すため |
-| COCO データセット本体 | サイズが大きく、GitHub にアップロードするものではないため |
-
-### ローカルで実行した整理コマンド例
-
-```bash
-cd /export/space0/oyundari/jupyter/notebook/Kadai3b/dnn_kadai/ex8
-
-find . -name "__pycache__" -type d -exec rm -rf {} +
-find . -name ".ipynb_checkpoints" -type d -exec rm -rf {} +
-find . -name "*.pyc" -delete
-rm -f log.txt
-```
-
-整理後、Git に反映する場合は以下を実行します。
-
-```bash
-git status
-git add ex8
-git commit -m "Clean up ex8 files and update README"
-git push origin master
-```
 
 ## 考察
 
@@ -171,22 +129,6 @@ git push origin master
 
 最終的に、Train loss は `15.33`、Validation loss は `14.58` となり、学習は安定して進んだと考えられます。
 また、学習済みモデルを使用することで、入力画像に対して高速にスタイル変換を行うことができました。
-
-## ファイル構成
-
-```text
-ex8/
-├── train.py
-├── stylize.py
-├── style_img/
-│   └── our_style_img.png
-├── models/
-│   └── our_style_model.pt
-├── output_img/
-│   └── result_our.png
-├── cat.png
-└── README.md
-```
 
 ## まとめ
 
