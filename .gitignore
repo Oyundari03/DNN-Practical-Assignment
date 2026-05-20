@@ -2,3 +2,8 @@
 *.pth
 *.pth
 ex7/backup_output/
+ex7/backup_output/
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+*.pth
