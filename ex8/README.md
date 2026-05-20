@@ -111,11 +111,6 @@ Train loss と Validation loss が大きく離れていないため、学習デ�
 
 以下は，ソースコード付属モデルと自分で学習した Reverie スタイルモデルを用いて猫画像をスタイル変換した結果です。
 
-上段：スタイル画像
-下段：猫画像へのスタイル変換結果
-Style 1〜3：ソースコード付属モデル
-Style 4：自分で学習した Reverie スタイルモデル
-
 <img width="1277" height="548" alt="image" src="https://github.com/user-attachments/assets/9fb19fe4-e751-4075-99e0-208a01809e8c" />
 
 
