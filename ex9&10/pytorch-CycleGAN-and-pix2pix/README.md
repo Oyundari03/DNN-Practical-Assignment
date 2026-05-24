@@ -86,7 +86,7 @@ Generator には U-Net が使用されており、Encoder で抽出した特徴�
 
 ```text
 results/
-└── facades_label2photo_pretrained/
+└── facades_label2photo_pretrained/test_latest
     └── images/
 ```
 
@@ -162,7 +162,7 @@ Horse → Zebra → Horse
 
 ```text
 results/
-└── horse2zebra_pretrained/
+└── horse2zebra_pretrained/test_latest
     └── images/
 ```
 
